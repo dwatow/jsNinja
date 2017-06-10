@@ -1,35 +1,66 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>unit test</title>
-</head>
-<script type="text/javascript" src="log.js"></script>
-<script type="text/javascript" src="assert.js"></script>
-<script type="text/javascript">
-	var utest = new UnitTest();
+	<head>
+		<title>unit test</title>
+	</head>
+	<!-- <script type="text/javascript" src="log.js"></script> -->
+	<!-- <script type="text/javascript" src="assert.js"></script> -->
+	<script type="text/javascript">
+
+	(function(){
+		var ul;
+		this.assert = function assert(value, desc) {
+			var li = document.createElement("li");
+			li.className = value ? "pass" : "false";
+			li.appendChild(document.createTextNode(desc));
+			console.log('li: ', li);
+			ul.appendChild(li);
+			if (!value){
+				li.parentNode.parentNode.className = "fail";
+			}
+			return li;
+		};
+
+		this.test = function test(name, fn) {
+			ul = document.querySelector("#results");
+			//ul set sub ul, not result
+			console.log('ul: ', ul);
+			ul = this.assert(true, name).appendChild(
+				document.createElement("ul"));
+			console.log('ul: ', ul);
+			//run test function
+			fn();
+		};
+	}) ();
 
 	window.onload = function() {
-		utest.test("A test.", function() {
-			utest.assert(true, "First assertion completed");
-			utest.assert(true, "Second assertion completed");
-			utest.assert(true, "Third assertion completed");
+		test("A test.", function() {
+			assert(true, "First assertion completed");
+			assert(true, "Second assertion completed");
+			assert(true, "Third assertion completed");
 		});
-		utest.test("Aother test.", function() {
-			utest.assert(true, "First assertion completed");
-			utest.assert(false, "Second assertion completed");
-			utest.assert(true, "Third assertion completed");
+		test("Aother test.", function() {
+			assert(true, "First assertion completed");
+			assert(false, "Second assertion completed");
+			assert(true, "Third assertion completed");
 		});
-		utest.test("a third test.", function() {
-			utest.assert(null, "fail");
-			utest.assert(5, "pass");
+		test("a third test.", function() {
+			assert(null, "fail");
+			assert(5, "pass");
 		});
 	};
 </script>
-<style>
-	#results li.pass{ color:green; }
-	#results li.false{ color:red; }
-</style>
-<body>
-<ul id="results"></ul>
-</body>
+	<style>
+		#results li.pass {
+			color: green;
+		}
+
+		#results li.false {
+			color: red;
+		}
+
+	</style>
+	<body>
+		<ul id="results"></ul>
+	</body>
 </html>
