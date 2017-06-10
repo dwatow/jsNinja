@@ -7,8 +7,11 @@
 	<!-- <script type="text/javascript" src="assert.js"></script> -->
 	<script type="text/javascript">
 
-	(function(){
+	// (function(){
 		var ul;
+		var queue = [],
+		    paused = false;
+
 		this.assert = function assert(value, desc) {
 			var li = document.createElement("li");
 			li.className = value ? "pass" : "false";
@@ -22,31 +25,62 @@
 		};
 
 		this.test = function test(name, fn) {
-			ul = document.querySelector("#results");
-			//ul set sub ul, not result
-			console.log('ul: ', ul);
-			ul = this.assert(true, name).appendChild(
-				document.createElement("ul"));
-			console.log('ul: ', ul);
-			//run test function
-			fn();
+			queue.push(function () {
+				ul = document.querySelector("#results");
+				ul = this.assert(true, name).appendChild(
+					document.createElement("ul"));
+				fn();
+			});
+			runTest();
 		};
-	}) ();
+
+		this.pause = function () {
+			paused = true;
+		}
+
+		this.resume = function () {
+			paused = false;
+			setTimeout(runTest, 1);
+		}
+
+		function runTest () {
+			if (!paused && queue.length) {
+				queue.shift()(); //run first element of queue
+
+				if (!paused) {
+					resume(); //run myself after 1 sec;
+				}
+			}
+		}
+	// }) ();
 
 	window.onload = function() {
-		test("A test.", function() {
-			assert(true, "First assertion completed");
-			assert(true, "Second assertion completed");
-			assert(true, "Third assertion completed");
+		test("async test #1", function() {
+			pause();
+			setTimeout(function () {
+				assert(true, "First assertion completed");
+				// assert(true, "Second assertion completed");
+				// assert(true, "Third assertion completed");
+				resume(); //run myself after 1 sec;
+			}, 300);
+
 		});
-		test("Aother test.", function() {
-			assert(true, "First assertion completed");
-			assert(false, "Second assertion completed");
-			assert(true, "Third assertion completed");
+		test("async test #2", function() {
+			pause();
+			setTimeout(function () {
+				// assert(true, "First assertion completed");
+				assert(false, "Second assertion completed");
+				// assert(true, "Third assertion completed");
+				resume(); //run myself after 1 sec;
+			}, 300);
 		});
-		test("a third test.", function() {
-			assert(null, "fail");
-			assert(5, "pass");
+		test("async test #3", function() {
+			pause();
+			setTimeout(function () {
+				assert(null, "fail");
+				assert(5, "pass");
+				resume(); //run myself after 1 sec;
+			}, 300);
 		});
 	};
 </script>
